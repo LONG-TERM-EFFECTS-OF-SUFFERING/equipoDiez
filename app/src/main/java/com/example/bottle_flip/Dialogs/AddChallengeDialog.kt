@@ -4,6 +4,10 @@ import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.Log
+import android.view.ViewGroup
 import android.view.Window
 import android.widget.Button
 import android.widget.EditText
@@ -17,15 +21,40 @@ class AddChallengeDialog(context: Context, private val listener: (Challenge) -> 
         super.onCreate(savedInstanceState)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         setContentView(R.layout.dialog_add_challenge)
+        setCancelable(false)
 
-        val btnAdd: Button = findViewById(R.id.btnAddChallenge)
+        //ancho del dialog
+        window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+
+        val btnAdd: Button = findViewById(R.id.btnSave)
+        val btnCancel: Button = findViewById(R.id.btnCancel)
         val etDescription: EditText = findViewById(R.id.etDescription)
+
+        btnCancel.setOnClickListener {
+            dismiss()
+        }
+
+        etDescription.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                // Habilitar el botón solo si hay texto en el campo
+                btnAdd.isEnabled = !s.isNullOrEmpty()
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        })
 
         btnAdd.setOnClickListener {
             val description = etDescription.text.toString()
             if (description.isNotEmpty()) {
-                listener(Challenge(description = description))
-                dismiss()
+                try {
+                    val newChallenge = Challenge(description = description)
+                    listener(newChallenge)
+                    dismiss()
+                } catch (e: Exception) {
+                    Log.e("AddChallengeDialog", "Error creating challenge: ${e.message}")
+                }
             }
         }
     }
