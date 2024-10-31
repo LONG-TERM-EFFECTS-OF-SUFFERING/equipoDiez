@@ -1,4 +1,4 @@
-package com.example.bottle_flip
+package com.example.bottle_flip.adapter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.bottle_flip.databinding.ItemChallengeBinding
 import com.example.bottle_flip.model.Challenge
 
-class ChallengeAdapter(private val challengeList: MutableList<Challenge>) : RecyclerView.Adapter<ChallengeAdapter.ChallengeViewHolder>() {
+class ChallengeAdapter(private var challengeList: MutableList<Challenge>) : RecyclerView.Adapter<ChallengeAdapter.ChallengeViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChallengeViewHolder {
         val binding = ItemChallengeBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -21,6 +21,11 @@ class ChallengeAdapter(private val challengeList: MutableList<Challenge>) : Recy
     }
 
     override fun getItemCount(): Int = challengeList.size
+
+    fun updateChallenges(newChallenges: MutableList<Challenge>) {
+        challengeList = newChallenges
+        notifyDataSetChanged()
+    }
 
     fun addChallenge(challenge: Challenge) {
         challengeList.add(0, challenge)

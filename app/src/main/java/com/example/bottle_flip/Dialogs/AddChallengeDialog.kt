@@ -11,10 +11,16 @@ import android.view.ViewGroup
 import android.view.Window
 import android.widget.Button
 import android.widget.EditText
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.example.bottle_flip.model.Challenge
 import com.example.bottle_flip.R
+import com.example.bottle_flip.repository.ChallengeRepository
+import kotlinx.coroutines.launch
 
 class AddChallengeDialog(context: Context, private val listener: (Challenge) -> Unit) : Dialog(context) {
+
+    private val challengeRepository = ChallengeRepository(context)
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,8 +56,12 @@ class AddChallengeDialog(context: Context, private val listener: (Challenge) -> 
             if (description.isNotEmpty()) {
                 try {
                     val newChallenge = Challenge(description = description)
-                    listener(newChallenge)
-                    dismiss()
+                    // Guardar en la base de datos
+                    (context as? AppCompatActivity)?.lifecycleScope?.launch {
+                        challengeRepository.saveChallenge(newChallenge)
+                        listener(newChallenge)
+                        dismiss()
+                    }
                 } catch (e: Exception) {
                     Log.e("AddChallengeDialog", "Error creating challenge: ${e.message}")
                 }
